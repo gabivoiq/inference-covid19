@@ -7,9 +7,8 @@ dataset_file = "mps.dataset.xlsx"
 def parse_dataset():
     df = pd.read_excel(dataset_file)
 
-    df = df[df[entry.test_result].notnull() &
-            df[entry.test_result].isin({"POZITIV", "NEGATIV"})]
-    df = df.dropna(subset=[entry.declared_symptoms])
+    df = df[df[entry.test_result].isin({"POZITIV", "NEGATIV"})]
+    df = df.dropna(subset=[entry.declared_symptoms, entry.test_result])
 
     df = df.applymap(lambda x: x.lower() if type(x) == str else x)
 
