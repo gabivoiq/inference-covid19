@@ -1,23 +1,12 @@
 import pandas as pd
 import dataset_entry as e
 from sklearn.preprocessing import LabelEncoder
-import matplotlib.pyplot as plt
 from sklearn.svm import SVC
-from sklearn.metrics import r2_score
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report, confusion_matrix
 
 dataset_file = "mps.dataset.xlsx"
 
-
-def functie(coloana):
-    LE = LabelEncoder()
-    df[coloana] = LE.fit_transform(df[coloana])
-
-
-# print(LE.inverse_transform(csv1[coloana]))
 
 def parse_dataset():
     _df = pd.read_excel(dataset_file)
@@ -29,6 +18,9 @@ def parse_dataset():
     _df = _df.fillna(" ")
     _df = _df.applymap(lambda x: x.lower() if type(x) == str else x)
     _df = _df.applymap(lambda x: str(x))
+    _df.loc[_df[e.declared_symptoms].str.contains('asimpt', case=False), e.declared_symptoms] = 'asimptomatic'
+    _df.loc[_df[e.reported_symptoms_hospitalization]
+        .str.contains('asimpt', case=False), e.reported_symptoms_hospitalization] = 'asimptomatic'
 
     print("NUMBER OF ENTRIES:", _df.shape)
     print("NEGATIVE RESULTS:", _df[_df[e.test_result] == 'negativ'].shape)
