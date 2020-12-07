@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import metrics
 
-dataset_file1 = "mps.dataset.xlsx"
+dataset_file1 = "../mps.dataset.xlsx"
 dataset_exe = "exemplu.xlsx"
 filename = 'svclass.sav'
 label = LabelEncoder()
@@ -19,7 +19,7 @@ def parse_dataset(dataset_file):
     _df = pd.read_excel(dataset_file)
 
     _df = _df[_df[e.test_result].isin({"POZITIV", "NEGATIV"})]
-    _df = _df.dropna(subset=[e.declared_symptoms, e.test_result])
+    _df = _df.dropna(subset=[e.test_result])
     _df = _df.drop([e.source_institution, e.diagnosis_and_hospitalization_signs], 1)
 
     _df = _df.fillna(" ")
