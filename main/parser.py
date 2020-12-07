@@ -10,6 +10,9 @@ from sklearn import metrics
 dataset_file1 = "mps.dataset.xlsx"
 dataset_exe = "exemplu.xlsx"
 filename = 'svclass.sav'
+label = LabelEncoder()
+file_x = "x_test_dataset.csv"
+file_y = "y_test_dataset.csv"
 
 
 def parse_dataset(dataset_file):
@@ -36,7 +39,9 @@ def parse_dataset(dataset_file):
 
 
 def encode_data(_df):
-    _df = _df.apply(LabelEncoder().fit_transform)
+
+    _df = _df.apply(label.fit_transform)
+    # _df = _df.apply(label.inverse_transform)
     # print(_df)
     return _df
 
@@ -51,8 +56,15 @@ def split_and_train(_df):
     # x_exe = LabelEncoder().inverse_transform(x_train)
 
     # _df.to_excel("train_dataset.xlsx")
-    x_test.to_csv("x_test_dataset.csv")
-    y_test.to_csv("y_test_dataset.csv")
+    # print(y_test.shape)
+    # print(x_test.shape)
+    # frames = [x_test, y_test]
+    # h = pd.concat(frames)
+    # h = _df.apply(label.inverse_transform)
+    # h.to_csv("x_test_dataset.csv")
+
+    x_test.to_csv(file_x, index=False)
+    y_test.to_csv(file_y, index=False)
 
     # dfff = pd.DataFrame(y_test)
     # print(dff[dff[e.test_result] == 1].size)
@@ -63,14 +75,21 @@ def split_and_train(_df):
     pickle.dump(svclassifier, open(filename, 'wb'))
 
 
-def test(_df):
+def test(_df, file_x, file_y):
     svclass = pickle.load(open(filename, 'rb'))
 
-    data = _df.drop([e.test_result], axis=1)
-    y_test = pd.read_csv("y_test_dataset.csv")
-    y_pred = svclass.predict(data)
+    if file_x is None and file_y is None:
+        x_test = _df.drop([e.test_result], axis=1)
+        y_test = _df[e.test_result]
+    else:
+        x_test = pd.read_csv(file_x)
+        y_test = pd.read_csv(file_y)
+
+    y_pred = svclass.predict(x_test)
+
     print(confusion_matrix(y_test, y_pred))
     print(classification_report(y_test, y_pred))
+
     fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred)
     print(metrics.auc(fpr, tpr))
 
@@ -79,4 +98,4 @@ if __name__ == "__main__":
     df = parse_dataset(dataset_file1)
     df = encode_data(df)
     split_and_train(df)
-    test(df)
+    test(df, file_x, file_y)
