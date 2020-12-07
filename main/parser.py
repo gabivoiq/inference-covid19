@@ -32,17 +32,12 @@ def parse_dataset(dataset_file):
     print("NUMBER OF ENTRIES:", _df.shape)
     print("NEGATIVE RESULTS:", _df[_df[e.test_result] == 'negativ'].shape)
     print("POSITIVE RESULTS:", _df[_df[e.test_result] == 'pozitiv'].shape)
-    # _df.to_excel("output_dataset.xlsx")
-    # _df.to_csv("output_dataset.csv")
 
     return _df
 
 
 def encode_data(_df):
-
     _df = _df.apply(label.fit_transform)
-    # _df = _df.apply(label.inverse_transform)
-    # print(_df)
     return _df
 
 
@@ -52,23 +47,11 @@ def split_and_train(_df):
     x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=1 / 3, random_state=0,
                                                         stratify=target)
 
-    # _df = _df.apply(LabelEncoder().inverse_transform)
-    # x_exe = LabelEncoder().inverse_transform(x_train)
-
-    # _df.to_excel("train_dataset.xlsx")
-    # print(y_test.shape)
-    # print(x_test.shape)
-    # frames = [x_test, y_test]
-    # h = pd.concat(frames)
-    # h = _df.apply(label.inverse_transform)
-    # h.to_csv("x_test_dataset.csv")
+    print("POSITIVE RESULTS TRAIN:", y_train.loc[y_train == 1].size)
+    print("POSITIVE RESULTS TEST:", y_test.loc[y_test == 1].size)
 
     x_test.to_csv(file_x, index=False)
     y_test.to_csv(file_y, index=False)
-
-    # dfff = pd.DataFrame(y_test)
-    # print(dff[dff[e.test_result] == 1].size)
-    # print(dfff[dfff[e.test_result] == 1].size)
 
     svclassifier = SVC(C=10, kernel='rbf', gamma=0.01)
     svclassifier.fit(x_train, y_train)
@@ -86,12 +69,14 @@ def test(_df, file_x, file_y):
         y_test = pd.read_csv(file_y)
 
     y_pred = svclass.predict(x_test)
-
-    print(confusion_matrix(y_test, y_pred))
+    matrix = confusion_matrix(y_test, y_pred)
+    print("Confusion matrix:\n", matrix)
+    print("Precision: ", matrix[0][0] / (matrix[0][0] + matrix[0][1]))
+    print("Rappel:", matrix[0][0] / (matrix[0][0] + matrix[1][0]))
     print(classification_report(y_test, y_pred))
 
     fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred)
-    print(metrics.auc(fpr, tpr))
+    print("AUC:", metrics.auc(fpr, tpr))
 
 
 if __name__ == "__main__":
