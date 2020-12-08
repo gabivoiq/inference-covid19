@@ -69,12 +69,12 @@ def test(_df, file_xx, file_yy):
     y_pred = svclass.predict(x_test)
     matrix = confusion_matrix(y_test, y_pred)
     print("Confusion matrix:\n", matrix)
-    accuracy = (matrix[0][0] + matrix[0][1]) / (matrix[0][0] + matrix[0][1] + matrix[1][0] + matrix[1][1])
+    accuracy = (matrix[0][0] + matrix[1][1]) / (matrix[0][0] + matrix[0][1] + matrix[1][0] + matrix[1][1])
     print("Accuracy:", accuracy)
     precision = matrix[0][0] / (matrix[0][0] + matrix[0][1])
     print("Precision:", precision)
     rappel = matrix[0][0] / (matrix[0][0] + matrix[1][0])
-    print("Rappel:", rappel)
+    print("Recall:", rappel)
     f1_score = (2 * precision * rappel) / (precision + rappel)
     print("F1 score:", f1_score)
     print(classification_report(y_test, y_pred))
@@ -89,7 +89,7 @@ def test(_df, file_xx, file_yy):
             [int(matrix[1][0]), int(matrix[1][1])]
         ],
         "precision": precision,
-        "rappel": rappel,
+        "recall": rappel,
         "f1_score": f1_score,
         "auc": auc
     }
