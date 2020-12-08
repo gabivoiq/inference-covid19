@@ -11,8 +11,6 @@ dataset_file1 = "mps.dataset.xlsx"
 dataset_exe = "exemplu.xlsx"
 filename = 'svclass.sav'
 label = LabelEncoder()
-file_x = "x_test_dataset.csv"
-file_y = "y_test_dataset.csv"
 
 
 def parse_dataset(dataset_file):
@@ -58,15 +56,15 @@ def split_and_train(_df):
     pickle.dump(svclassifier, open(filename, 'wb'))
 
 
-def test(_df):
+def test(_df, file_xx, file_yy):
     svclass = pickle.load(open(filename, 'rb'))
 
-    if file_x is None and file_y is None:
+    if file_xx is None and file_yy is None:
         x_test = _df.drop([e.test_result], axis=1)
         y_test = _df[e.test_result]
     else:
-        x_test = pd.read_csv(file_x)
-        y_test = pd.read_csv(file_y)
+        x_test = pd.read_csv(file_xx)
+        y_test = pd.read_csv(file_yy)
 
     y_pred = svclass.predict(x_test)
     matrix = confusion_matrix(y_test, y_pred)
@@ -101,7 +99,9 @@ def test(_df):
 
 
 if __name__ == "__main__":
+    file_x = "x_test_dataset.csv"
+    file_y = "y_test_dataset.csv"
     df = parse_dataset(dataset_file1)
     df = encode_data(df)
     split_and_train(df)
-    test(df)
+    test(df, file_x, file_y)
