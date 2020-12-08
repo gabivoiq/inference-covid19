@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Covid inference</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+</head>
+<body>
+    <div id = "drop-area">
+    <form class = "my-form" action="http://localhost:5000/uploader" method="POST"
+        enctype="multipart/form-data">
+        <input type="file" id="fileElem" onchange="handleFiles(this.files)">
+        <label class="button" for="fileElem">Select a file</label>
+    </form>
+    </div>
+    <div id = "content"></div>
+
+    <script src ="../static/js/script.js"></script>
+</body>
+</html>

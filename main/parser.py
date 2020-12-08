@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import metrics
 
-dataset_file1 = "../mps.dataset.xlsx"
+dataset_file1 = "mps.dataset.xlsx"
 dataset_exe = "exemplu.xlsx"
 filename = 'svclass.sav'
 label = LabelEncoder()
@@ -26,8 +26,8 @@ def parse_dataset(dataset_file):
     _df = _df.applymap(lambda x: x.lower() if type(x) == str else x)
     _df = _df.applymap(lambda x: str(x))
     _df.loc[_df[e.declared_symptoms].str.contains('asimpt', case=False), e.declared_symptoms] = 'asimptomatic'
-    _df.loc[_df[e.reported_symptoms_hospitalization]
-                .str.contains('asimpt', case=False), e.reported_symptoms_hospitalization] = 'asimptomatic'
+    _df.loc[_df[e.reported_symptoms_hospitalization].str.contains('asimpt',
+                                                                  case=False), e.reported_symptoms_hospitalization] = 'asimptomatic'
 
     print("NUMBER OF ENTRIES:", _df.shape)
     print("NEGATIVE RESULTS:", _df[_df[e.test_result] == 'negativ'].shape)
@@ -58,7 +58,7 @@ def split_and_train(_df):
     pickle.dump(svclassifier, open(filename, 'wb'))
 
 
-def test(_df, file_x, file_y):
+def test(_df):
     svclass = pickle.load(open(filename, 'rb'))
 
     if file_x is None and file_y is None:
@@ -71,16 +71,37 @@ def test(_df, file_x, file_y):
     y_pred = svclass.predict(x_test)
     matrix = confusion_matrix(y_test, y_pred)
     print("Confusion matrix:\n", matrix)
-    print("Precision: ", matrix[0][0] / (matrix[0][0] + matrix[0][1]))
-    print("Rappel:", matrix[0][0] / (matrix[0][0] + matrix[1][0]))
+    accuracy = (matrix[0][0] + matrix[0][1]) / (matrix[0][0] + matrix[0][1] + matrix[1][0] + matrix[1][1])
+    print("Accuracy:", accuracy)
+    precision = matrix[0][0] / (matrix[0][0] + matrix[0][1])
+    print("Precision:", precision)
+    rappel = matrix[0][0] / (matrix[0][0] + matrix[1][0])
+    print("Rappel:", rappel)
+    f1_score = (2 * precision * rappel) / (precision + rappel)
+    print("F1 score:", f1_score)
     print(classification_report(y_test, y_pred))
 
     fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred)
-    print("AUC:", metrics.auc(fpr, tpr))
+    auc = metrics.auc(fpr, tpr)
+    print("AUC:", auc)
+    data = {
+        "accuracy" : accuracy,
+        "confusion_matrix": [
+            [int(matrix[0][0]), int(matrix[0][1])],
+            [int(matrix[1][0]), int(matrix[1][1])]
+        ],
+        "precision": precision,
+        "rappel": rappel,
+        "f1_score": f1_score,
+        "auc": auc
+    }
+    print(data)
+
+    return data
 
 
 if __name__ == "__main__":
     df = parse_dataset(dataset_file1)
     df = encode_data(df)
     split_and_train(df)
-    test(df, file_x, file_y)
+    test(df)
