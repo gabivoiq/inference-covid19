@@ -11,8 +11,6 @@ dataset_file1 = "mps.dataset.xlsx"
 dataset_exe = "exemplu.xlsx"
 filename = 'svclass.sav'
 label = LabelEncoder()
-file_x = "x_test_dataset.csv"
-file_y = "y_test_dataset.csv"
 
 
 def parse_dataset(dataset_file):
@@ -58,25 +56,25 @@ def split_and_train(_df):
     pickle.dump(svclassifier, open(filename, 'wb'))
 
 
-def test(_df):
+def test(_df, file_xx, file_yy):
     svclass = pickle.load(open(filename, 'rb'))
 
-    if file_x is None and file_y is None:
+    if file_xx is None and file_yy is None:
         x_test = _df.drop([e.test_result], axis=1)
         y_test = _df[e.test_result]
     else:
-        x_test = pd.read_csv(file_x)
-        y_test = pd.read_csv(file_y)
+        x_test = pd.read_csv(file_xx)
+        y_test = pd.read_csv(file_yy)
 
     y_pred = svclass.predict(x_test)
     matrix = confusion_matrix(y_test, y_pred)
     print("Confusion matrix:\n", matrix)
-    accuracy = (matrix[0][0] + matrix[0][1]) / (matrix[0][0] + matrix[0][1] + matrix[1][0] + matrix[1][1])
+    accuracy = (matrix[0][0] + matrix[1][1]) / (matrix[0][0] + matrix[0][1] + matrix[1][0] + matrix[1][1])
     print("Accuracy:", accuracy)
     precision = matrix[0][0] / (matrix[0][0] + matrix[0][1])
     print("Precision:", precision)
     rappel = matrix[0][0] / (matrix[0][0] + matrix[1][0])
-    print("Rappel:", rappel)
+    print("Recall:", rappel)
     f1_score = (2 * precision * rappel) / (precision + rappel)
     print("F1 score:", f1_score)
     print(classification_report(y_test, y_pred))
@@ -91,7 +89,7 @@ def test(_df):
             [int(matrix[1][0]), int(matrix[1][1])]
         ],
         "precision": precision,
-        "rappel": rappel,
+        "recall": rappel,
         "f1_score": f1_score,
         "auc": auc
     }
@@ -101,7 +99,9 @@ def test(_df):
 
 
 if __name__ == "__main__":
+    file_x = "x_test_dataset.csv"
+    file_y = "y_test_dataset.csv"
     df = parse_dataset(dataset_file1)
     df = encode_data(df)
     split_and_train(df)
-    test(df)
+    test(df, file_x, file_y)
